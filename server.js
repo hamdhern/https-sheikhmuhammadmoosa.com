@@ -14,12 +14,14 @@ app.use(express.static(__dirname)); // Serve static files from current directory
 
 // Database connection configuration
 const dbConfig = {
-    host: process.env.DB_HOST || 'switchback.proxy.rlwy.net',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'B2007_bb_2021',
-    database: process.env.DB_NAME || 'islamic_lectures',
-    port: process.env.DB_PORT || 21241, // Default MySQL port
-    charset: 'utf8mb4'
+  host: 'switchback.proxy.rlwy.net',
+  user: 'root',
+  password: 'uJXiSTNxbcKldDxZoimECGWVUesYaIIM', // your MySQL password
+  database: 'railway',
+  port: 21241, // replace with your actual port if it's different
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 };
 
 let db;
@@ -27,21 +29,9 @@ let db;
 // Initialize database connection
 const initDB = async () => {
     try {
-        // Create connection without database first
-        const connection = await mysql.createConnection({
-            host: dbConfig.host,
-            user: dbConfig.user,
-            password: dbConfig.password,
-            charset: 'utf8mb4'
-        });
-
-        // Create database if it doesn't exist
-        await connection.execute(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
-        await connection.end();
-
-        // Now connect to the specific database
+        // Connect directly to the database
         db = await mysql.createConnection(dbConfig);
-        
+
         // Create videos table if it doesn't exist
         await db.execute(`
             CREATE TABLE IF NOT EXISTS videos (
