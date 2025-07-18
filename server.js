@@ -14,10 +14,11 @@ app.use(express.static(__dirname)); // Serve static files from current directory
 
 // Database connection configuration
 const dbConfig = {
-    host: process.env.DB_HOST || 'localhost',
+    host: process.env.DB_HOST || 'switchback.proxy.rlwy.net',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || 'B2007_bb_2021',
     database: process.env.DB_NAME || 'islamic_lectures',
+    port: process.env.DB_PORT || 21241, // Default MySQL port
     charset: 'utf8mb4'
 };
 
