@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Preconnect to Google Fonts for faster loading -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <!-- Link to Google Fonts for styling (Josefin Sans and PT Sans) -->
+        <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+        
+        <!-- Meta tags for character encoding and viewport settings -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <!-- Title of the page that can be translated -->
+        <title>ވީޑިއޯ ދަރުސްތައް</title>
+        
+        <!-- Linking the external stylesheet for the page -->
+        <link rel="stylesheet" href="styles.css">
+    </head>
+
+    <body>
+        <header>
+            <div class="header-container">
+                <h1>ވީޑިއޯ ދަރުސްތައް</h1>
+
+                <!-- Hamburger icon for mobile -->
+                <div class="hamburger" id="hamburger">
+                    <span></span>  <!-- First line -->
+                    <span></span>  <!-- Second line -->
+                    <span></span>  <!-- Third line -->
+                </div>
+
+                <!-- Desktop navigation menu -->
+                <nav id="nav-menu">
+                    <ul>
+                        <li class="nav-item"><a href="about.html">ޝައިޚްއާއި ބެހޭގޮތުން</a></li>
+                        <li class="nav-item"><a href="video.html">ވީޑިއޯ ދަރުސްތައް</a></li>
+                        <li class="nav-item"><a href="audio.html">އޯޑިއޯ ދަރުސްތައް</a></li>
+                        <li class="nav-item"><a href="index.html">މައި ޞޮފްޙާ</a></li>
+                    </ul>
+                </nav>
+
+                <!-- Mobile navigation menu (hidden by default, toggled via hamburger icon) -->
+                <nav id="myLinks">
+                    <ul>
+                        <li class="nav-item"><a href="index.html">މައި ޞޮފްޙާ</a></li>
+                        <li class="nav-item"><a href="audio.html">އޯޑިއޯ ދަރުސްތައް</a></li>
+                        <li class="nav-item"><a href="video.html">ވީޑިއޯ ދަރުސްތައް</a></li>
+                        <li class="nav-item"><a href="about.html">ޝައިޚްއާއި ބެހޭގޮތުން</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        
+        <section class="lectures">
+            <input type="text" id="search-bar" placeholder="ވީޑިއޯ ދަރުހެއް ހޯއްދެވުމަށް">
+            <div id="video-lectures-container" class="video-lectures-container"></div>
+            <div id="video-pagination" class="pagination"></div>
+        </section>
+
+        <script>
+            // Configuration
+            const API_BASE_URL = '/api'; // Change this if your API is on a different domain
+            const videosPerPage = 5; // Number of videos to display per page
+            let currentPage = 1; // Initial page number
+            let maxVisiblePages = 3; // Maximum number of visible pagination links
+            let pageGroupStart = 1; // Start of pagination group
+            let currentSearchTerm = ''; // Store current search term
+
+            // References to DOM elements
+            const container = document.getElementById('video-lectures-container');
+            const pagination = document.getElementById('video-pagination');
+            const searchBar = document.getElementById('search-bar');
+
+            // Function to fetch videos from API
+            const fetchVideos = async (page = 1, search = '') => {
+                try {
+                    const params = new URLSearchParams({
+                        page: page,
+                        limit: videosPerPage
+                    });
+                    
+                    if (search) {
+                        params.append('search', search);
+                    }
+
+                    const response = await fetch(`${API_BASE_URL}/videos?${params}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    return data;
+                } catch (error) {
+                    console.error('Error fetching videos:', error);
+                    showError('Failed to load videos. Please try again.');
+                    return null;
+                }
+            };
+
+            // Function to show error message
+            const showError = (message) => {
+                container.innerHTML = `
+                    <div class="error-message">
+                        <h3>ގޯސް</h3>
+                        <p>${message}</p>
+                        <button onclick="loadVideos()" class="retry-btn">އަލުން ޓްރައި ކުރޭ</button>
+                    </div>
+                `;
+                pagination.innerHTML = '';
+            };
+
+            // Function to show loading state
+            const showLoading = () => {
+                container.innerHTML = `
+                    <div class="loading-message">
+                        <h3>ލޯޑްވަނީ...</h3>
+                        <div class="loading-spinner"></div>
+                    </div>
+                `;
+            };
+
+            // Function to dynamically render videos on the page
+            const renderVideos = (videos) => {
+                if (!videos || videos.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-videos-message">
+                            <h3>ވީޑިއޯ ނެތް</h3>
+                            <p>ހޯދި ބަޔަކަށް ވީޑިއޯ ނުލިބުނު</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = ''; // Clear the container before rendering new content
+
+                // Loop through each video and create its HTML
+                videos.forEach((lecture, index) => {
+                    const div = document.createElement('div');
+                    div.classList.add('lecture-item'); // Add class for styling
+
+                    let videoElement = '';
+
+                    // Check and embed YouTube videos
+                    if (lecture.file_url.includes('youtube.com') || lecture.file_url.includes('youtu.be')) {
+                        const videoId = lecture.file_url.match(/(?:youtube\.com.*(?:\?|&)v=|youtu\.be\/)([a-zA-Z0-9_-]+)/)?.[1];
+                        if (videoId) {
+                            videoElement = `
+                                <div class="video-wrapper">
+                                    <iframe class="video-player youtube-video" src="https://www.youtube.com/embed/${videoId}?enablejsapi=1" frameborder="0" allowfullscreen></iframe>
+                                </div>`;
+                        }
+                    }
+                    // Check and embed Facebook videos
+                    else if (lecture.file_url.includes('facebook.com')) {
+                        videoElement = `
+                            <div class="video-wrapper">
+                                <iframe class="video-player facebook-video" src="https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(lecture.file_url)}&show_text=0" frameborder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
+                            </div>`;
+                    }
+                    // Embed local or other video types
+                    else {
+                        videoElement = `
+                            <div class="video-wrapper">
+                                <video class="video-player local-video" controls oncontextmenu="return false;" disablepictureinpicture controlsList="nodownload">
+                                    <source src="${lecture.file_url}" type="video/mp4">
+                                </video>
+                            </div>`;
+                    }
+
+                    // Set the inner content of the div and append it to the container
+                    div.innerHTML = `<h3>${lecture.title || 'Untitled Video'}</h3>${videoElement}`;
+                    container.appendChild(div);
+                });
+
+                // Add event listeners to pause other local videos when one is played
+                const localVideos = container.querySelectorAll('.local-video');
+                localVideos.forEach(video => {
+                    video.addEventListener('play', () => {
+                        localVideos.forEach(otherVideo => {
+                            if (otherVideo !== video) {
+                                otherVideo.pause();
+                            }
+                        });
+                    });
+                });
+            };
+
+            // Function to disable keyboard shortcuts (only added once globally)
+            const disableKeyboardShortcuts = () => {
+                document.addEventListener('keydown', (event) => {
+                    if (event.ctrlKey && ['s', 'u', 'p'].includes(event.key.toLowerCase())) {
+                        event.preventDefault();
+                        alert('Downloading is disabled!');
+                    }
+                });
+            };
+
+            // Function to disable the context menu on video elements (only added once globally)
+            const disableRightClick = () => {
+                document.addEventListener('contextmenu', (event) => {
+                    if (event.target.tagName === 'VIDEO') {
+                        event.preventDefault();
+                    }
+                });
+            };
+
+            // Call these functions once to apply global event listeners
+            disableKeyboardShortcuts();
+            disableRightClick();
+
+            // Function to render pagination buttons
+            const renderPagination = (paginationData) => {
+                pagination.innerHTML = ''; // Clear existing pagination buttons
+                
+                if (!paginationData || paginationData.totalPages <= 1) {
+                    return; // No pagination needed if only one page exists
+                }
+
+                const { currentPage: apiCurrentPage, totalPages, hasNextPage, hasPrevPage } = paginationData;
+
+                // Function to create a single pagination button
+                const createPageButton = (text, isActive, pageNum) => {
+                    const btn = document.createElement('button');
+                    btn.innerText = text; // Set button text
+                    btn.classList.add('page-link'); // Add class for styling
+                    if (isActive) btn.classList.add('active'); // Highlight active page
+                    btn.addEventListener('click', () => {
+                        if (pageNum !== currentPage) {
+                            currentPage = pageNum; // Set current page
+                            loadVideos(); // Load videos for the selected page
+                        }
+                    });
+                    return btn;
+                };
+
+                // Calculate page group boundaries
+                const pageGroupEnd = Math.min(pageGroupStart + maxVisiblePages - 1, totalPages);
+
+                // Add "previous" arrow for navigating to the previous group of pages
+                if (pageGroupStart > 1) {
+                    const prevArrow = createPageButton('«', false, pageGroupStart - 1);
+                    prevArrow.addEventListener('click', () => {
+                        pageGroupStart = Math.max(1, pageGroupStart - maxVisiblePages); // Move to the previous group
+                        currentPage = pageGroupStart;
+                        loadVideos();
+                    });
+                    pagination.appendChild(prevArrow);
+                }
+
+                // Generate and append page buttons for the current group
+                for (let i = pageGroupStart; i <= pageGroupEnd; i++) {
+                    pagination.appendChild(createPageButton(i, i === apiCurrentPage, i));
+                }
+
+                // Add "next" arrow for navigating to the next group of pages
+                if (pageGroupEnd < totalPages) {
+                    const nextArrow = createPageButton('»', false, pageGroupEnd + 1);
+                    nextArrow.addEventListener('click', () => {
+                        pageGroupStart = Math.min(totalPages - maxVisiblePages + 1, pageGroupStart + maxVisiblePages); // Move to the next group
+                        currentPage = pageGroupStart;
+                        loadVideos();
+                    });
+                    pagination.appendChild(nextArrow);
+                }
+            };
+
+            // Main function to load videos
+            const loadVideos = async () => {
+                showLoading();
+                
+                const data = await fetchVideos(currentPage, currentSearchTerm);
+                if (data) {
+                    renderVideos(data.videos);
+                    renderPagination(data.pagination);
+                }
+            };
+
+            // Event listener for search bar input to filter videos by title
+            let searchTimeout;
+            searchBar.addEventListener('input', (e) => {
+                currentSearchTerm = e.target.value.toLowerCase();
+                
+                // Clear previous timeout
+                clearTimeout(searchTimeout);
+                
+                // Debounce search to avoid too many API calls
+                searchTimeout = setTimeout(() => {
+                    currentPage = 1; // Reset to the first page when searching
+                    pageGroupStart = 1; // Reset the pagination group
+                    loadVideos();
+                }, 300); // 300ms delay
+            });
+
+            // Initial load
+            document.addEventListener('DOMContentLoaded', () => {
+                loadVideos();
+            });
+
+            // Prevents the default action of the right-click context menu across the entire document
+            document.addEventListener("contextmenu", (event) => event.preventDefault());
+        </script>
+                
+        <!-- Footer section with copyright information -->
+        <footer>
+            <p>&copy; 2025 sheikhmuhammadmoosa.mv - All rights reserved</p>
+        </footer>
+
+        <!-- Script to handle hamburger menu for mobile view -->
+        <script src="hamburger.js"></script>
+
+    </body>
+</html>

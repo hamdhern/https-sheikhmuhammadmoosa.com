@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Preconnect to Google Fonts for faster loading -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <!-- Link to Google Fonts for styling (Josefin Sans and PT Sans) -->
+        <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+        
+        <!-- Meta tags for character encoding and viewport settings -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <!-- Title of the page that can be translated -->
+        <title>ޝައިޚް މުޙައްމަދު މޫސާގެ ދަރުސްތައް</title>
+        
+        <!-- Linking the external stylesheet for the page -->
+        <link rel="stylesheet" href="styles.css">
+
+        <script>
+            // Prevents the default action of the right-click context menu across the entire document
+            document.addEventListener("contextmenu", (event) => event.preventDefault());
+        </script>
+    </head>
+
+    <body>
+        <header>
+            <div class="header-container">
+                <h1>ޝައިޚް މުޙައްމަދު މޫސާގެ ދަރުސްތައް</h1>
+
+                <!-- Hamburger icon for mobile -->
+                <div class="hamburger" id="hamburger">
+                    <span></span>  <!-- First line -->
+                    <span></span>  <!-- Second line -->
+                    <span></span>  <!-- Third line -->
+                </div>
+
+                <!-- Desktop navigation menu -->
+                <nav id="nav-menu">
+                    <ul>
+                        <li class="nav-item"><a href="about.html">ޝައިޚްއާއި ބެހޭގޮތުން</a></li>
+                        <li class="nav-item"><a href="video.html">ވީޑިއޯ ދަރުސްތައް</a></li>
+                        <li class="nav-item"><a href="audio.html">އޯޑިއޯ ދަރުސްތައް</a></li>
+                        <li class="nav-item"><a href="index.html">މައި ޞޮފްޙާ</a></li>
+                    </ul>
+                </nav>
+
+                <!-- Mobile navigation menu (hidden by default, toggled via hamburger icon) -->
+                <nav id="myLinks">
+                    <ul>
+                        <li class="nav-item"><a href="index.html">މައި ޞޮފްޙާ</a></li>
+                        <li class="nav-item"><a href="audio.html">އޯޑިއޯ ދަރުސްތައް</a></li>
+                        <li class="nav-item"><a href="video.html">ވީޑިއޯ ދަރުސްތައް</a></li>
+                        <li class="nav-item"><a href="about.html">ޝައިޚްއާއި ބެހޭގޮތުން</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <section class="intro">
+            <div class="gif" id="g1">
+                <h2 id="slide1" class="text-center" >ޝައިޚް މުޙައްމަދު މޫސާގެ ދަރުސްތައް</h2>
+            </div>
+            <div class="gif" id="g2">
+                <h2 id="slide2" class="text-center">އޯޑިއޯ އަދި ވީޑިއޯ ދަރުސްތައް</h2>
+            </div>
+            <div class="gif" id="g3">
+                <h2 id="slide3" class="text-center">ޝައިޚް މުޙައްމަދު މޫސާގެ އޯޑިއޯ ދަރުސްތައް މި ވެބްސައިޓް މެދުވެރިކޮށް އަޑުއެއްސެވޭނެ</h2>
+            </div>
+            <div class="gif" id="g4">
+                <h2 id="slide4" class="text-center">ޝައިޚް މުޙައްމަދު މޫސާގެ ވީޑިއޯ ދަރުސްތައް މި ވެބްސައިޓް މެދުވެރިކޮށް ބެއްލެވޭނެ</h2>
+            </div>
+            <div class="cta-buttons">
+                <a href="video.html" id="cta-video">ވީޑިއޯ ދަރުސްތައް</a>
+                <a href="audio.html" id="cta-audio">އޯޑިއޯ ދަރުސްތައް</a>
+            </div>
+        </section>
+    
+        <section class="features">
+            <div class="feature-item">
+                <h3 id="feature2-title">ވީޑިއޯ ދަރުސްތައް</h3>
+                <p id="feature2-text">ޝައިޚް މުޙައްމަދު މޫސާގެ ވީޑިއޯ ދަރުސްތައް މި ވެބްސައިޓް މެދުވެރިކޮށް ބެއްލެވޭނެ</p>
+            </div>
+            <div class="feature-item">
+                <h3 id="feature1-title">އޯޑިއޯ ދަރުސްތައް</h3>
+                <p id="feature1-text">ޝައިޚް މުޙައްމަދު މޫސާގެ އޯޑިއޯ ދަރުސްތައް މި ވެބްސައިޓް މެދުވެރިކޮށް އަޑުއެއްސެވޭނެ</p>
+            </div>
+        </section>
+
+        <!-- Footer section with copyright information -->
+        <footer>
+            <p>&copy; 2025 sheikhmuhammadmoosa.mv - All rights reserved</p>
+        </footer>
+
+        <!-- Script to handle hamburger menu for mobile view -->
+        <script src="hamburger.js"></script>
+
+    </body>
+</html>

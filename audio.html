@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Preconnect to Google Fonts for faster loading -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <!-- Link to Google Fonts for styling (Josefin Sans and PT Sans) -->
+        <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+        
+        <!-- Meta tags for character encoding and viewport settings -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <!-- Title of the page that can be translated -->
+        <title>އޯޑިއޯ ދަރުސްތައް</title>
+        
+        <!-- Linking the external stylesheet for the page -->
+        <link rel="stylesheet" href="styles.css">
+    </head>
+
+    <body>
+        <header>
+            <div class="header-container">
+                <!-- Main heading for the page with dynamic translation -->
+                <h1>އޯޑިއޯ ދަރުސްތައް</h1>
+
+                <!-- Hamburger icon for mobile (3 horizontal bars) -->
+                <div class="hamburger" id="hamburger">
+                    <span></span>  <!-- First line -->
+                    <span></span>  <!-- Second line -->
+                    <span></span>  <!-- Third line -->
+                </div>
+
+                <!-- Desktop navigation menu -->
+                <nav id="nav-menu">
+                    <ul>
+                        <li class="nav-item"><a href="about.html">ޝައިޚްއާއި ބެހޭގޮތުން</a></li>
+                        <li class="nav-item"><a href="video.html">ވީޑިއޯ ދަރުސްތައް</a></li>
+                        <li class="nav-item"><a href="audio.html">އޯޑިއޯ ދަރުސްތައް</a></li>
+                        <li class="nav-item"><a href="index.html">މައި ޞޮފްޙާ</a></li>
+                    </ul>
+                </nav>
+
+                <!-- Mobile navigation menu (hidden by default, toggled via hamburger icon) -->
+                <nav id="myLinks">
+                    <ul>
+                        <li class="nav-item"><a href="index.html">މައި ޞޮފްޙާ</a></li>
+                        <li class="nav-item"><a href="audio.html">އޯޑިއޯ ދަރުސްތައް</a></li>
+                        <li class="nav-item"><a href="video.html">ވީޑިއޯ ދަރުސްތައް</a></li>
+                        <li class="nav-item"><a href="about.html">ޝައިޚްއާއި ބެހޭގޮތުން</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Section containing the lectures -->
+        <section class="lectures">
+            <!-- Search bar for filtering audio lectures -->
+            <input type="text" id="search-bar" placeholder="އޯޑިއޯ ދަރުހެއް ހޯއްދެވުމަށް">
+            
+            <!-- Container where the audio lectures will be displayed -->
+            <div id="audio-lectures-container" class="audio-lectures-container"></div>
+            
+            <!-- Pagination controls for audio lectures -->
+            <div id="audio-pagination" class="pagination"></div>
+        </section>
+
+        <script>
+            // Fetching the audio lectures data from 'dharus.json'
+            fetch('dharus.json')
+                .then(response => response.json())
+                .then(data => {
+                    const audiosPerPage = 5; // Set to display 5 items per page
+                    let currentPage = 1; // Initial page is 1
+                    let pageGroupStart = 1;
+                    const maxVisiblePages = 3;
+                    
+                    // Getting references to elements in the DOM
+                    const container = document.getElementById('audio-lectures-container');
+                    const pagination = document.getElementById('audio-pagination');
+                    const searchBar = document.getElementById('search-bar');
+                    
+                    // Function to render the audio lectures on the page
+                    const renderAudios = (audios) => {
+                    container.innerHTML = ''; // Clear the container before rendering new content
+                    const start = (currentPage - 1) * audiosPerPage; // Start index for the current page
+                    const end = start + audiosPerPage; // End index for the current page
+                    const paginatedAudios = audios.slice(start, end); // Slice the data to get current page's audios
+
+                    // Loop through each lecture and create HTML for it
+                    paginatedAudios.forEach(lecture => {
+                        const div = document.createElement('div');
+                        div.classList.add('lecture-item'); // Add a class for styling
+                        div.innerHTML = `
+                            <h3>${lecture.title}</h3>
+                            <audio controls controlsList="nodownload">
+                                <source src="${lecture.file}" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio>
+                        `;
+                        container.appendChild(div); // Append the new lecture item to the container
+                    });
+
+                    // Add event listeners to pause other audio elements when one is played
+                    const audioElements = container.querySelectorAll('audio');
+                    audioElements.forEach(audio => {
+                        audio.addEventListener('play', () => {
+                            audioElements.forEach(otherAudio => {
+                                if (otherAudio !== audio) {
+                                    otherAudio.pause();
+                                }
+                            });
+                        });
+                    });
+                };
+
+                    // Function to render pagination buttons
+                    const createPageButton = (text, isActive, pageNumber) => {
+                        const button = document.createElement('button');
+                        button.innerText = text;
+                        button.classList.add('page-link'); // Add styling class
+                        if (isActive) button.classList.add('active'); // Highlight active page
+                        button.addEventListener('click', () => {
+                            currentPage = pageNumber; // Set the current page on click
+                            renderAudios(data.audio); // Re-render audio lectures for the selected page
+                            renderPagination(data.audio); // Re-render pagination buttons
+                        });
+                        return button;
+                    };
+
+                    // Dynamically creates and renders pagination buttons for navigating through audio lectures
+                    // Includes logic to handle page groups for better usability with large datasets
+                    const renderPagination = (audios) => {
+                        pagination.innerHTML = ''; // Clear existing pagination buttons
+                        const totalPages = Math.ceil(audios.length / audiosPerPage); // Calculate number of pages
+        
+                        if (pageGroupStart > 1) {
+                            const prevArrow = createPageButton('«', false, pageGroupStart - 1);
+                            prevArrow.addEventListener('click', () => {
+                                pageGroupStart = Math.max(1, pageGroupStart - maxVisiblePages);
+                                renderPagination(audios);
+                            });
+                            pagination.appendChild(prevArrow);
+                        }
+        
+                        const pageGroupEnd = Math.min(pageGroupStart + maxVisiblePages - 1, totalPages);
+                        for (let i = pageGroupStart; i <= pageGroupEnd; i++) {
+                            pagination.appendChild(createPageButton(i, i === currentPage, i)); // Append the page link button
+                        }
+        
+                        if (pageGroupEnd < totalPages) {
+                            const nextArrow = createPageButton('»', false, pageGroupEnd + 1);
+                            nextArrow.addEventListener('click', () => {
+                                pageGroupStart = Math.min(totalPages - maxVisiblePages + 1, pageGroupStart + maxVisiblePages);
+                                renderPagination(audios);
+                            });
+                            pagination.appendChild(nextArrow);
+                        }
+                    };
+                    
+                    // Search handler function to filter audio lectures by title
+                    searchBar.addEventListener('input', (e) => {
+                        const searchText = e.target.value.toLowerCase();
+                        const filteredAudios = data.audio.filter(lecture => lecture.title.toLowerCase().includes(searchText));
+                        currentPage = 1; // Reset to the first page when searching
+                        pageGroupStart = 1;
+                        renderAudios(filteredAudios); // Render the filtered audios
+                        renderPagination(filteredAudios); // Update pagination for filtered audios
+                    });
+        
+                    renderAudios(data.audio);
+                    renderPagination(data.audio);
+                })
+                .catch(error => console.error('Error loading lectures:', error)); // Log errors if the fetch fails
+
+                // Prevents the default action of the right-click context menu across the entire document
+                document.addEventListener("contextmenu", (event) => event.preventDefault());
+        </script>
+        
+        <!-- Footer section with copyright information -->
+        <footer>
+                <p>&copy; 2025 sheikhmuhammadmoosa.mv - All rights reserved</p>
+        </footer>
+
+        <!-- Script to handle hamburger menu for mobile view -->
+        <script src="hamburger.js"></script>
+
+    </body>
+</html>

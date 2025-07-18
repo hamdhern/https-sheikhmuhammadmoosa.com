@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Management - Admin Panel</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .admin-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .admin-btn {
+            background: var(--highlight-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .admin-btn:hover {
+            background: var(--hover-highlight-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .admin-btn.danger {
+            background: #dc3545;
+        }
+
+        .admin-btn.danger:hover {
+            background: #c82333;
+        }
+
+        .admin-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: inherit;
+            border-radius: 8px 8px 0 0;
+            margin-right: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            background: var(--highlight-color);
+            transform: translateY(2px);
+        }
+
+        .tab-button:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .releases-item {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .release-thumbnail {
+            width: 200px;
+            height: 120px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .release-info {
+            flex: 1;
+            padding: 1rem;
+        }
+
+        .release-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .release-meta {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        .release-description {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            line-height: 1.4;
+            max-height: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .release-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .status-approved {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-rejected {
+            background: #dc3545;
+            color: white;
+        }
+
+        .video-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-family: inherit;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .video-list {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .video-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .video-info {
+            flex: 1;
+        }
+
+        .video-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .video-url {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            word-break: break-all;
+        }
+
+        .video-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1bc58d, #228b22);
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .close {
+            color: white;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .video-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .video-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .admin-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Video Management</h1>
+            <p>Manage video lectures in the database</p>
+        </div>
+
+        <div class="admin-actions">
+            <button class="admin-btn" onclick="showAddModal()">Add New Video</button>
+            <button class="admin-btn" onclick="loadVideos()">Refresh Videos</button>
+            <button class="admin-btn" onclick="loadReleases()">Refresh Releases</button>
+            <a href="/" class="admin-btn">Back to Website</a>
+        </div>
+
+        <!-- Admin Tabs -->
+        <div class="admin-tabs">
+            <button class="tab-button active" onclick="showTab('videos')">Videos</button>
+            <button class="tab-button" onclick="showTab('releases')">Releases</button>
+        </div>
+
+        <!-- Videos Tab Content -->
+        <div id="videos-tab" class="tab-content active">
+            <div class="video-list">
+                <h2>Video List</h2>
+                <div id="videoListContainer">
+                    <div class="loading-message">
+                        <h3>Loading videos...</h3>
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+                <div id="adminPagination" class="pagination"></div>
+            </div>
+        </div>
+
+        <!-- Releases Tab Content -->
+        <div id="releases-tab" class="tab-content">
+            <div class="video-list">
+                <h2>Video Releases from YouTube</h2>
+                <p>Review and approve new videos fetched from YouTube channels</p>
+                
+                <!-- Status Filter -->
+                <div style="margin-bottom: 1rem;">
+                    <label for="statusFilter" style="margin-right: 1rem;">Filter by status:</label>
+                    <select id="statusFilter" onchange="loadReleases()" style="padding: 0.5rem; border-radius: 4px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.3);">
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="all">All</option>
+                    </select>
+                </div>
+                
+                <div id="releasesListContainer">
+                    <div class="loading-message">
+                        <h3>Loading releases...</h3>
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+                <div id="releasesPagination" class="pagination"></div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Video Modal -->
+        <div id="videoModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2 id="modalTitle">Add New Video</h2>
+                <form id="videoForm" class="video-form">
+                    <input type="hidden" id="videoId">
+                    <div class="form-group">
+                        <label for="videoTitle">Custom Title:</label>
+                        <input type="text" id="videoTitle" required placeholder="Enter any custom title for this video">
+                    </div>
+                    <div class="form-group">
+                        <label for="videoUrl">File URL:</label>
+                        <input type="url" id="videoUrl" required placeholder="Enter video URL (YouTube, Facebook, or direct link)">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="admin-btn">Save Video</button>
+                        <button type="button" class="admin-btn" onclick="closeModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = '/api';
+        let currentPage = 1;
+        let totalPages = 1;
+        let isEditing = false;
+        let currentReleasePage = 1;
+        let totalReleasePages = 1;
+
+        // Tab Management
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            // Load data for the selected tab
+            if (tabName === 'videos') {
+                loadVideos();
+            } else if (tabName === 'releases') {
+                loadReleases();
+            }
+        }
+
+        // Releases Management
+        async function loadReleases(page = 1) {
+            try {
+                const status = document.getElementById('statusFilter').value;
+                const response = await fetch(`${API_BASE_URL}/releases?page=${page}&limit=10&status=${status}`);
+                const data = await response.json();
+                
+                displayReleases(data.releases);
+                displayReleasesPagination(data.pagination);
+                currentReleasePage = data.pagination.currentPage;
+                totalReleasePages = data.pagination.totalPages;
+            } catch (error) {
+                console.error('Error loading releases:', error);
+                document.getElementById('releasesListContainer').innerHTML = `
+                    <div class="error-message">
+                        <h3>Error</h3>
+                        <p>Failed to load releases. Please try again.</p>
+                        <button onclick="loadReleases()" class="retry-btn">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Display releases
+        function displayReleases(releases) {
+            const container = document.getElementById('releasesListContainer');
+            
+            if (!releases || releases.length === 0) {
+                container.innerHTML = `
+                    <div class="no-videos-message">
+                        <h3>No Releases Found</h3>
+                        <p>No releases available for the selected status.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = releases.map(release => `
+                <div class="releases-item">
+                    <img src="${release.thumbnail_url || '/placeholder.jpg'}" alt="Thumbnail" class="release-thumbnail" onerror="this.src='/placeholder.jpg'">
+                    <div class="release-info">
+                        <div class="release-title">${release.title}</div>
+                        <div class="release-meta">
+                            <span class="status-badge status-${release.status}">${release.status}</span>
+                            Published: ${new Date(release.published_at).toLocaleDateString()}
+                            ${release.channel_title ? ` • Channel: ${release.channel_title}` : ''}
+                        </div>
+                        <div class="release-description">${release.description || 'No description available'}</div>
+                    </div>
+                    <div class="release-actions">
+                        ${release.status === 'pending' ? `
+                            <button class="admin-btn btn-small" onclick="approveRelease(${release.id})">✓ Approve</button>
+                            <button class="admin-btn btn-small danger" onclick="rejectRelease(${release.id})">✗ Reject</button>
+                        ` : ''}
+                        <a href="${release.youtube_url}" target="_blank" class="admin-btn btn-small">🔗 View</a>
+                        <button class="admin-btn btn-small danger" onclick="deleteRelease(${release.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Display releases pagination
+        function displayReleasesPagination(paginationData) {
+            const container = document.getElementById('releasesPagination');
+            
+            if (paginationData.totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = '';
+            
+            // Previous button
+            if (paginationData.hasPrevPage) {
+                paginationHTML += `<button class="page-link" onclick="loadReleases(${paginationData.currentPage - 1})">Previous</button>`;
+            }
+
+            // Page numbers
+            for (let i = 1; i <= paginationData.totalPages; i++) {
+                const isActive = i === paginationData.currentPage ? 'active' : '';
+                paginationHTML += `<button class="page-link ${isActive}" onclick="loadReleases(${i})">${i}</button>`;
+            }
+
+            // Next button
+            if (paginationData.hasNextPage) {
+                paginationHTML += `<button class="page-link" onclick="loadReleases(${paginationData.currentPage + 1})">Next</button>`;
+            }
+
+            container.innerHTML = paginationHTML;
+        }
+
+        // Approve a release
+        async function approveRelease(id) {
+            // Prompt for custom title
+            let customTitle = prompt('Enter a custom title for this video (leave blank to use the original title):');
+            if (customTitle === null) {
+                // Cancelled
+                return;
+            }
+            if (!confirm('Are you sure you want to approve this video and add it to the main videos list?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/releases/${id}/approve`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        custom_title: customTitle && customTitle.trim() ? customTitle.trim() : undefined
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Video approved and added to main list successfully');
+                    loadReleases(currentReleasePage);
+                } else {
+                    throw new Error('Failed to approve video');
+                }
+            } catch (error) {
+                console.error('Error approving video:', error);
+                alert('Failed to approve video');
+            }
+        }
+
+        // Reject a release
+        async function rejectRelease(id) {
+            if (!confirm('Are you sure you want to reject this video?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/releases/${id}/reject`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    alert('Video rejected successfully');
+                    loadReleases(currentReleasePage);
+                } else {
+                    throw new Error('Failed to reject video');
+                }
+            } catch (error) {
+                console.error('Error rejecting video:', error);
+                alert('Failed to reject video');
+            }
+        }
+
+        // Delete a release
+        async function deleteRelease(id) {
+            if (!confirm('Are you sure you want to delete this release permanently?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/releases/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Release deleted successfully');
+                    loadReleases(currentReleasePage);
+                } else {
+                    throw new Error('Failed to delete release');
+                }
+            } catch (error) {
+                console.error('Error deleting release:', error);
+                alert('Failed to delete release');
+            }
+        }
+
+        // Load videos from API
+        async function loadVideos(page = 1) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/videos?page=${page}&limit=10`);
+                const data = await response.json();
+                
+                displayVideos(data.videos);
+                displayPagination(data.pagination);
+                currentPage = data.pagination.currentPage;
+                totalPages = data.pagination.totalPages;
+            } catch (error) {
+                console.error('Error loading videos:', error);
+                document.getElementById('videoListContainer').innerHTML = `
+                    <div class="error-message">
+                        <h3>Error</h3>
+                        <p>Failed to load videos. Please try again.</p>
+                        <button onclick="loadVideos()" class="retry-btn">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Display videos in the list
+        function displayVideos(videos) {
+            const container = document.getElementById('videoListContainer');
+            
+            if (!videos || videos.length === 0) {
+                container.innerHTML = `
+                    <div class="no-videos-message">
+                        <h3>No Videos Found</h3>
+                        <p>No videos available in the database.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = videos.map(video => `
+                <div class="video-item">
+                    <div class="video-info">
+                        <div class="video-title">${video.title}</div>
+                        <div class="video-url">${video.file_url}</div>
+                    </div>
+                    <div class="video-actions">
+                        <button class="admin-btn btn-small" onclick="editVideo(${video.id})">Edit</button>
+                        <button class="admin-btn btn-small danger" onclick="deleteVideo(${video.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Display pagination
+        function displayPagination(paginationData) {
+            const container = document.getElementById('adminPagination');
+            
+            if (paginationData.totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = '';
+            
+            // Previous button
+            if (paginationData.hasPrevPage) {
+                paginationHTML += `<button class="page-link" onclick="loadVideos(${paginationData.currentPage - 1})">Previous</button>`;
+            }
+
+            // Page numbers
+            for (let i = 1; i <= paginationData.totalPages; i++) {
+                const isActive = i === paginationData.currentPage ? 'active' : '';
+                paginationHTML += `<button class="page-link ${isActive}" onclick="loadVideos(${i})">${i}</button>`;
+            }
+
+            // Next button
+            if (paginationData.hasNextPage) {
+                paginationHTML += `<button class="page-link" onclick="loadVideos(${paginationData.currentPage + 1})">Next</button>`;
+            }
+
+            container.innerHTML = paginationHTML;
+        }
+
+        // Show add video modal
+        function showAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Video';
+            document.getElementById('videoForm').reset();
+            document.getElementById('videoId').value = '';
+            isEditing = false;
+            document.getElementById('videoModal').style.display = 'block';
+        }
+
+        // Show edit video modal
+        async function editVideo(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/videos/${id}`);
+                const video = await response.json();
+                
+                document.getElementById('modalTitle').textContent = 'Edit Video';
+                document.getElementById('videoId').value = video.id;
+                document.getElementById('videoTitle').value = video.title;
+                document.getElementById('videoUrl').value = video.file_url;
+                isEditing = true;
+                document.getElementById('videoModal').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading video:', error);
+                alert('Failed to load video details');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('videoModal').style.display = 'none';
+        }
+
+        // Delete video
+        async function deleteVideo(id) {
+            if (!confirm('Are you sure you want to delete this video?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/videos/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Video deleted successfully');
+                    loadVideos(currentPage);
+                } else {
+                    throw new Error('Failed to delete video');
+                }
+            } catch (error) {
+                console.error('Error deleting video:', error);
+                alert('Failed to delete video');
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('videoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const id = document.getElementById('videoId').value;
+            const title = document.getElementById('videoTitle').value;
+            const fileUrl = document.getElementById('videoUrl').value;
+
+            try {
+                const url = isEditing ? `${API_BASE_URL}/videos/${id}` : `${API_BASE_URL}/videos`;
+                const method = isEditing ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        file_url: fileUrl
+                    })
+                });
+
+                if (response.ok) {
+                    alert(isEditing ? 'Video updated successfully' : 'Video added successfully');
+                    closeModal();
+                    loadVideos(currentPage);
+                } else {
+                    throw new Error('Failed to save video');
+                }
+            } catch (error) {
+                console.error('Error saving video:', error);
+                alert('Failed to save video');
+            }
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('videoModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadVideos();
+        });
+    </script>
+</body>
+</html>

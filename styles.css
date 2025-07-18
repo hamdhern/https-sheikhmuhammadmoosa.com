@@ -1,0 +1,950 @@
+*,
+::before,
+::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --main-bg-color: linear-gradient(
+    300deg,
+    #1bc58d,
+    #959595,
+    #228b22,
+    #38c23b,
+    #50c878,
+    #199f3a
+  );
+  --text-color: #fff;
+  --highlight-color: #42b844;
+  --hover-highlight-color: #367839;
+  --shadow-color: rgba(0, 0, 0, 0.2);
+  --shadow-hover-color: rgba(0, 0, 0, 0.3);
+  --glow-color: rgba(0, 255, 0, 0.2);
+}
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+@font-face {
+  font-family: "Faruma";
+  src: url(MV_Faseyha.otf) format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+body {
+  font-family: "Faruma", sans-serif;
+  background: var(--main-bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  background-size: 400% 400%;
+  animation: gradientBG 12s ease infinite;
+  transition: opacity 0.5s ease;
+  position: relative;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: -1;
+}
+
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.glowing-text {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-color);
+  text-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color),
+    0 0 30px var(--glow-color);
+}
+
+@keyframes glowing {
+  0% {
+    text-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color),
+      0 0 30px var(--glow-color);
+  }
+  50% {
+    text-shadow: 0 0 15px var(--glow-color), 0 0 25px var(--glow-color),
+      0 0 35px var(--glow-color);
+  }
+  100% {
+    text-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color),
+      0 0 30px var(--glow-color);
+  }
+}
+
+header {
+  background: rgba(255, 255, 255, 0);
+  padding: 2.5rem 0;
+  color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  font-family: "Faruma", serif;
+  flex-wrap: wrap;
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+header h1 {
+  font-size: 2.5rem;
+  color: var(--text-color);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 1.875rem; /* 30px */
+  padding: 0;
+  margin: 0;
+}
+
+nav a {
+  text-decoration: none;
+  color: var(--text-color);
+  font-size: 1.1rem;
+  font-weight: 600;
+  position: relative;
+  padding: 0.5rem 0; /* Add padding for better hover area */
+  display: inline-block; /* Ensure padding works correctly */
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+/* Hover and focus state for highlight */
+nav a:hover,
+nav a:focus {
+  color: var(--highlight-color); /* Highlight color on hover/focus */
+  text-shadow: 0 3px 8px var(--glow-color); /* Add a subtle glow */
+  outline: none; /* Remove default focus outline */
+}
+
+/* Underline pseudo-element */
+nav a::before {
+  content: "";
+  position: absolute;
+  bottom: 0; /* Position underline at the bottom */
+  left: 0; /* Start underline from the left */
+  width: 0;
+  height: 3px;
+  background-color: var(--highlight-color);
+  border-radius: 1.5px; /* Slightly rounded ends */
+  transition: width 0.3s ease-out; /* Smooth width transition */
+}
+
+/* Expand underline on hover/focus */
+nav a:hover::before,
+nav a:focus::before {
+  width: 100%;
+}
+
+section {
+  padding: 4rem 20px;
+}
+
+.intro {
+  text-align: center;
+  margin-top: 50px;
+  padding: 20px;
+}
+
+.intro h2 {
+  font-size: 3rem;
+  font-family: "Faruma", serif;
+  color: var(--text-color);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+  letter-spacing: 1px;
+  margin-bottom: 1.25rem;
+}
+
+.intro p {
+  font-size: 1.3rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.8;
+  margin-bottom: 1.875rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem; /* Increased gap */
+  margin-top: 6.25rem;
+  font-family: "Faruma", serif;
+  position: relative;
+  z-index: 10;
+}
+
+.cta-buttons a {
+  display: inline-block;
+  padding: 1rem 2rem; /* Slightly larger padding */
+  border-radius: 8px; /* Less rounded corners */
+  background: linear-gradient(
+    145deg,
+    var(--highlight-color),
+    var(--hover-highlight-color)
+  ); /* Gradient background */
+  color: var(--text-color);
+  font-size: 1.1rem; /* Slightly larger font */
+  font-weight: 700; /* Bolder text */
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 1px; /* Added letter spacing */
+  box-shadow: 0 5px 10px var(--shadow-color),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2); /* More complex shadow */
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.4s ease;
+  position: relative; /* Needed for pseudo-element */
+  overflow: hidden; /* Hide overflowing pseudo-element */
+}
+
+.cta-buttons a::before {
+  /* Add a subtle shine effect on hover */
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.6s ease;
+}
+
+.cta-buttons a:hover,
+.cta-buttons a:focus {
+  background: linear-gradient(
+    145deg,
+    var(--hover-highlight-color),
+    var(--highlight-color)
+  ); /* Invert gradient on hover */
+  transform: translateY(-3px) scale(1.03); /* Lift and slightly scale */
+  box-shadow: 0 8px 15px var(--shadow-hover-color),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1); /* Enhanced shadow */
+  outline: none;
+}
+
+.cta-buttons a:hover::before {
+  left: 100%; /* Move shine effect across the button */
+}
+
+.cta-buttons a:active {
+  /* Style for when the button is clicked */
+  transform: translateY(1px) scale(1);
+  box-shadow: 0 2px 5px var(--shadow-color), inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.features {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  margin: 3.125rem 0;
+}
+
+.feature-item {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1.25rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px var(--shadow-color);
+  text-align: center;
+  width: 280px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-item:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 6px 12px var(--shadow-hover-color);
+}
+
+/* Lectures Section */
+.lectures {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px 0;
+  text-align: center;
+}
+
+.lecture-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.lecture-item {
+  background: transparent;
+  padding: 30px;
+  text-align: center;
+  transition: transform 0.3s ease;
+  flex: 1 1 calc(50% - 40px);
+}
+
+.lecture-item:hover {
+  transform: translateY(-10px);
+}
+
+.video-lectures-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+/* About Section Styles */
+.about {
+  padding: 3rem 1.25rem; /* Consistent padding */
+  text-align: center; /* Center align content */
+}
+
+.about-container {
+  max-width: 1000px;
+  margin: 0 auto; /* Center container */
+  background: rgba(255, 255, 255, 0.05); /* Subtle background */
+  padding: 2rem; /* Inner padding */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 4px 8px var(--shadow-color); /* Add shadow */
+}
+
+.about h2 {
+  font-size: 2.5rem;
+  color: var(--text-color); /* Use text color variable */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Consistent shadow */
+  margin-bottom: 1.5rem; /* Spacing below heading */
+}
+
+.bio,
+.details,
+.contact {
+  font-size: 1.2rem;
+  line-height: 1.7; /* Improve readability */
+  color: rgba(255, 255, 255, 0.9); /* Slightly lighter text */
+  margin-bottom: 1.5rem; /* Consistent spacing */
+}
+
+.contact a {
+  color: var(--highlight-color);
+  text-decoration: none;
+  font-weight: 600; /* Make links stand out */
+  transition: color 0.3s ease, text-shadow 0.3s ease; /* Smooth transition */
+}
+
+.contact a:hover {
+  color: var(--hover-highlight-color); /* Use hover color variable */
+  text-decoration: underline;
+  text-shadow: 0 0 5px var(--glow-color); /* Add subtle glow on hover */
+}
+
+footer {
+  padding: 5rem;
+  text-align: center;
+  color: #aaa;
+  margin-top: auto;
+}
+
+footer p {
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  nav ul {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .lecture-item {
+    padding: 10px;
+  }
+}
+
+.gif {
+  margin-top: 9rem;
+  position: absolute;
+  width: 100%;
+  top: 47%;
+  animation: fadeslideUp 16s infinite;
+}
+
+.gif h2 {
+  font-size: 32px;
+  font-family: "Faruma", serif;
+  text-align: center;
+  margin-top: 33rem;
+  margin-right: 2.8125rem;
+}
+
+#g2 {
+  animation-delay: -12s;
+}
+
+#g3 {
+  animation-delay: -8s;
+}
+
+#g4 {
+  animation-delay: -4s;
+}
+
+@keyframes fadeslideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(-40%);
+  }
+
+  10% {
+    opacity: 1;
+    transform: translateY(-50%);
+  }
+
+  20% {
+    opacity: 1;
+    transform: translateY(-50%);
+  }
+
+  25% {
+    opacity: 0;
+    transform: translateY(-60%);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-60%);
+  }
+}
+
+.contact {
+  margin-top: 1.25rem;
+}
+
+.contact-icons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 0.625rem;
+  flex-wrap: wrap;
+}
+
+.contact-item {
+  font-size: 2rem;
+  color: #4d58ff;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.contact-item:hover {
+  color: #007bff;
+  transform: scale(1.1);
+}
+
+.contact-item i {
+  margin-bottom: 5px;
+}
+
+.contact-item span {
+  font-size: 1rem;
+  color: #f8f6f6;
+  margin-top: 5px;
+}
+
+#search-bar {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 25px;
+  outline: none;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  margin-top: 0; /* Removed top margin */
+  margin-bottom: 10px; /* Kept bottom margin */
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  text-align: center;
+  font-family: "Faruma", "Josefin Sans", Arial, Helvetica, sans-serif;
+}
+
+#search-bar:focus {
+  box-shadow: 0 0 10px var(--highlight-color), 0 0 20px var(--glow-color);
+  transform: scale(1.05);
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+#search-button {
+  background-color: var(--highlight-color);
+  border: none;
+  color: var(--text-color);
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease,
+    box-shadow 0.3s ease;
+  box-shadow: 0 4px 8px var(--shadow-color);
+  position: relative;
+  overflow: hidden;
+}
+
+#search-button:hover {
+  background-color: var(--hover-highlight-color);
+  transform: scale(1.1);
+  box-shadow: 0 6px 12px var(--shadow-hover-color);
+}
+
+#search-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease-in-out;
+  z-index: 1;
+}
+
+#search-button:hover::before {
+  left: 100%;
+}
+
+#search-bar::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.25rem;
+  gap: 0.625rem;
+}
+
+.page-link {
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  color: #333;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.page-link:hover {
+  background-color: #e0e0e0;
+}
+
+.page-link.active {
+  background-color: #45a049;
+  color: #fff;
+}
+
+.video-wrapper {
+  width: 80%; /* Adjust width (percentage or px) */
+  max-width: 600px; /* Optional: limit maximum width */
+  aspect-ratio: 16 / 9; /* Maintain video aspect ratio */
+  margin: 0 auto; /* Center the video */
+}
+
+.video-wrapper iframe,
+.video-wrapper video {
+  width: 100%; /* Ensure the video fits the container */
+  height: 100%; /* Ensure aspect ratio is maintained */
+  border-radius: 10px; /* Optional: rounded corners */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#nav-menu {
+  display: block;
+}
+
+#myLinks {
+  display: none;
+}
+
+#hamburger {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  footer {
+    padding: 1.25rem;
+    text-align: center;
+    color: #aaa;
+    margin-top: auto;
+  }
+
+  .gif {
+    position: absolute;
+    width: 100%;
+    top: 45%;
+    animation: fadeslideUp 16s infinite;
+  }
+
+  #nav-menu {
+    display: none;
+  }
+
+  #hamburger {
+    display: block;
+    background-color: transparent;
+    border: none;
+    margin-top: 19px;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 9999;
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  }
+
+  #hamburger:hover {
+    transform: scale(1.1);
+  }
+
+  #hamburger span {
+    display: block;
+    width: 30px;
+    height: 4px;
+    background-color: var(--text-color);
+    margin: 6px 0;
+    transition: all 0.3s ease;
+  }
+
+  #hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(7px, 7px);
+  }
+
+  #hamburger.active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  #hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(-7px, 7px);
+  }
+
+  #hamburger.active span {
+    position: relative;
+    top: 0;
+  }
+
+  #myLinks.show {
+    display: block;
+    position: absolute;
+    top: 70px;
+    right: 0;
+    width: 100%;
+    background: linear-gradient(
+      135deg,
+      rgba(94, 161, 95, 0.95),
+      rgba(50, 90, 50, 0.95)
+    );
+    z-index: 1000;
+    text-align: center;
+    padding: 20px 0;
+    margin: 0;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    animation: fadeInMenu 0.5s ease-out forwards;
+  }
+
+  @keyframes fadeInMenu {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  #myLinks ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #myLinks ul li {
+    padding: 15px 0;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    width: 80%;
+    transition: all 0.3s ease;
+  }
+
+  #myLinks ul li:last-child {
+    border-bottom: none;
+  }
+
+  #myLinks ul li:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+  }
+
+  #myLinks ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 600;
+    display: block;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: color 0.3s ease;
+  }
+
+  #myLinks ul li a:hover {
+    color: var(--highlight-color);
+  }
+
+  #myLinks ul li a:active {
+    background-color: var(--highlight-color);
+    color: var(--text-color);
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+  }
+}
+
+@font-face {
+  font-family: "Faruma";
+  src: url(Faruma.ttf) format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+body.dhivehi-font {
+  font-family: "Faruma", sans-serif;
+}
+
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1600px;
+    padding: 0 5%;
+  }
+
+  body {
+    font-size: 1.2rem;
+  }
+}
+
+/* General H2 Styling */
+h2 {
+  font-family: "Faruma", serif; /* Consistent font */
+  color: var(--text-color);
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.75); /* Enhanced shadow */
+  letter-spacing: 1.5px; /* Slightly more spacing */
+  margin-bottom: 1.75rem; /* Consistent bottom margin */
+  position: relative;
+  padding-bottom: 0.6rem; /* Space for potential underline */
+  text-align: center; /* Center align H2 by default */
+}
+
+/* Optional: Add a subtle underline effect */
+h2::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+  width: 60px; /* Adjust width */
+  height: 4px; /* Slightly thicker */
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--highlight-color),
+    transparent
+  ); /* Gradient underline */
+  border-radius: 2px;
+  opacity: 0.8; /* Slight transparency */
+}
+
+/* Refine specific H2 styles */
+.intro h2 {
+  font-size: 3rem; /* Keep larger size for intro */
+  margin-bottom: 1.25rem; /* Specific margin */
+}
+
+.lectures h2 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem; /* Specific margin */
+}
+
+.about h2 {
+  font-size: 2.5rem;
+  /* Inherits general styles */
+}
+
+/* Reset styles for .gif h2 as it's positioned uniquely */
+.gif h2 {
+  font-size: 32px;
+  text-align: center;
+  margin-top: -24rem;
+  margin-right: 2.8125rem;
+  padding-bottom: 0; /* Remove padding */
+  text-shadow: none; /* Remove general shadow if desired */
+  letter-spacing: normal; /* Reset letter spacing */
+  margin-bottom: 0; /* Reset margin */
+}
+.gif h2::after {
+  content: none; /* Remove underline for gif h2 */
+}
+
+/* Loading, Error, and No Videos States */
+.loading-message,
+.error-message,
+.no-videos-message {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  margin: 2rem auto;
+  max-width: 600px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.loading-message h3,
+.error-message h3,
+.no-videos-message h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.loading-message p,
+.error-message p,
+.no-videos-message p {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid var(--highlight-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.retry-btn {
+  background: var(--highlight-color);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.retry-btn:hover {
+  background: var(--hover-highlight-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.retry-btn:active {
+  transform: translateY(0);
+}
+
+/* Enhanced pagination for better UX */
+.pagination .page-link {
+  transition: all 0.2s ease;
+}
+
+.pagination .page-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+.pagination .page-link:active {
+  transform: translateY(0);
+}
+
+/* Improved responsive design for mobile devices */
+@media (max-width: 768px) {
+  .loading-message,
+  .error-message,
+  .no-videos-message {
+    margin: 1rem;
+    padding: 2rem 1rem;
+  }
+
+  .loading-message h3,
+  .error-message h3,
+  .no-videos-message h3 {
+    font-size: 1.5rem;
+  }
+
+  .retry-btn {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.9rem;
+  }
+}
