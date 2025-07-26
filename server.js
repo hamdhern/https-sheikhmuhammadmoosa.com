@@ -266,6 +266,16 @@ app.get('/api/releases', async (req, res) => {
     }
 });
 
+app.get('/audio/:filename', (req, res) => {
+  const audioPath = path.join(__dirname, 'audio', req.params.filename);
+  res.sendFile(audioPath, (err) => {
+    if (err) {
+      console.error('Error serving audio file:', err);
+      res.status(404).send('Audio file not found');
+    }
+  });
+});
+
 // Approve a release and add to videos table
 app.post('/api/releases/:id/approve', async (req, res) => {
     try {
