@@ -11,8 +11,9 @@ const PORT = process.env.PORT || 21241;
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname)); // Serve static files from current directory
-app.use('/audio', express.static(path.join(__dirname, 'audio')));
-
+app.use('/audio', express.static(path.join(__dirname, 'audio'), {
+  acceptRanges: true
+}));
 
 const mime = require('mime');
 app.use((req, res, next) => {
