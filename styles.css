@@ -20,7 +20,7 @@
 .download-btn-bottom {
   background: #43a047;
   color: #fff;
-  font-family: "PT Sans", "Josefin Sans", Arial, sans-serif;
+  font-family: "Faruma", serif;
   font-size: 1.1rem;
   font-weight: 700;
   padding: 14px 32px;
@@ -96,7 +96,7 @@ body {
 }
 
 body {
-  font-family: "Faruma", sans-serif;
+  font-family: "Faruma", serif;
   background: var(--main-bg-color);
   color: var(--text-color);
   line-height: 1.6;
@@ -552,7 +552,7 @@ footer p {
   background: rgba(255, 255, 255, 0.15);
   color: #fff;
   text-align: center;
-  font-family: "Faruma", "Josefin Sans", Arial, Helvetica, sans-serif;
+  font-family: "Faruma", serif;
 }
 
 #search-bar:focus {
@@ -825,7 +825,7 @@ footer p {
 }
 
 body.dhivehi-font {
-  font-family: "Faruma", sans-serif;
+  font-family: "Faruma", serif;
 }
 
 @media (min-width: 1400px) {
