@@ -50,6 +50,7 @@
     }
     .app-download-bottom-fixed {
         padding: 10px 0 18px 0;
+        display: none;
     }
 }
 *,
