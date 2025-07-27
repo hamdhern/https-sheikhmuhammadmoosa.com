@@ -1,57 +1,61 @@
 /* Floating App Download Button Styles */
 .app-download-bottom-fixed {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 16px 0 24px 0;
-    background: linear-gradient(180deg, rgba(255,255,255,0) 60%, rgba(0,0,0,0.07) 100%);
-    pointer-events: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 0 24px 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(0, 0, 0, 0.07) 100%
+  );
+  pointer-events: none;
 }
-
 
 .download-btn-bottom {
-    background: #43a047;
-    color: #fff;
-    font-family: 'PT Sans', 'Josefin Sans', Arial, sans-serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-    padding: 14px 32px;
-    border-radius: 32px;
-    box-shadow: 0 4px 16px rgba(67,160,71,0.15);
-    text-decoration: none;
-    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
-    pointer-events: auto;
-    border: none;
-    outline: none;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  background: #43a047;
+  color: #fff;
+  font-family: "PT Sans", "Josefin Sans", Arial, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 14px 32px;
+  border-radius: 32px;
+  box-shadow: 0 4px 16px rgba(67, 160, 71, 0.15);
+  text-decoration: none;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  pointer-events: auto;
+  border: none;
+  outline: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.download-btn-bottom:hover, .download-btn-bottom:focus {
-    background: #2e7031;
-    box-shadow: 0 6px 24px rgba(67,160,71,0.22);
-    transform: translateY(-2px) scale(1.03);
-    color: #fff;
-    text-decoration: none;
+.download-btn-bottom:hover,
+.download-btn-bottom:focus {
+  background: #2e7031;
+  box-shadow: 0 6px 24px rgba(67, 160, 71, 0.22);
+  transform: translateY(-2px) scale(1.03);
+  color: #fff;
+  text-decoration: none;
 }
 
 @media (max-width: 600px) {
-    .download-btn-bottom {
-        width: 90vw;
-        font-size: 1rem;
-        padding: 12px 0;
-        border-radius: 24px;
-    }
-    .app-download-bottom-fixed {
-        padding: 10px 0 18px 0;
-        display: none;
-    }
+  .download-btn-bottom {
+    width: 90vw;
+    font-size: 1rem;
+    padding: 12px 0;
+    border-radius: 24px;
+  }
+  .app-download-bottom-fixed {
+    padding: 10px 0 18px 0;
+    display: none;
+  }
 }
 *,
 ::before,
