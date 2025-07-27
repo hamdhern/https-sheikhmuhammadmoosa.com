@@ -156,7 +156,7 @@ nav a::before {
   content: "";
   position: absolute;
   bottom: 0; /* Position underline at the bottom */
-  left: 0; /* Start underline from the left */
+  right: 0; /* Start underline from the right */
   width: 0;
   height: 3px;
   background-color: var(--highlight-color);
