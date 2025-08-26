@@ -87,6 +87,12 @@ const initDB = async () => {
 // Get all videos with pagination and search
 app.get('/api/videos', async (req, res) => {
     try {
+        // Check if database connection is available
+        if (!db) {
+            console.error('Database connection not available');
+            return res.status(500).json({ error: 'Database connection not available' });
+        }
+
         const page = Math.max(1, parseInt(req.query.page) || 1);
         const limit = Math.max(1, Math.min(100, parseInt(req.query.limit) || 5)); // Limit between 1-100
         const search = (req.query.search || '').trim();
@@ -128,7 +134,18 @@ app.get('/api/videos', async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching videos:', error);
-        res.status(500).json({ error: 'Failed to fetch videos' });
+        const errorMessage = error.code === 'PROTOCOL_CONNECTION_LOST' 
+            ? 'Database connection was lost'
+            : error.code === 'ER_CON_COUNT_ERROR'
+            ? 'Database has too many connections'
+            : error.code === 'ECONNREFUSED'
+            ? 'Database connection was refused'
+            : 'Failed to fetch videos';
+        
+        res.status(500).json({ 
+            error: errorMessage,
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 });
 
