@@ -23,28 +23,36 @@ app.use((req, res, next) => {
   next();
 });
 
-// Database connection configuration
+// Database connection configuration (use env vars with safe defaults)
 const dbConfig = {
-  host: 'switchback.proxy.rlwy.net',
-  user: 'root',
-  password: 'uJXiSTNxbcKldDxZoimECGWVUesYaIIM', // your MySQL password
-  database: 'railway',
-  port: 21241, // replace with your actual port if it's different
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+    host: process.env.DB_HOST || 'switchback.proxy.rlwy.net',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || 'uJXiSTNxbcKldDxZoimECGWVUesYaIIM',
+    database: process.env.DB_NAME || 'railway',
+    port: Number(process.env.DB_PORT || 21241),
+    waitForConnections: true,
+    connectionLimit: Number(process.env.DB_CONNECTION_LIMIT || 10),
+    queueLimit: 0
 };
 
-let db;
+let pool;
+
+// Helper to execute queries via the pool
+const dbQuery = async (sql, params = []) => {
+    if (!pool) throw new Error('Database pool not initialized');
+    return pool.execute(sql, params);
+};
 
 // Initialize database connection
 const initDB = async () => {
     try {
-        // Connect directly to the database
-        db = await mysql.createConnection(dbConfig);
+        pool = mysql.createPool(dbConfig);
+
+        // Simple connectivity test
+        await pool.query('SELECT 1');
 
         // Create videos table if it doesn't exist
-        await db.execute(`
+        await pool.execute(`
             CREATE TABLE IF NOT EXISTS videos (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 title VARCHAR(500) NOT NULL,
@@ -56,7 +64,7 @@ const initDB = async () => {
         `);
 
         // Create releases table if it doesn't exist
-        await db.execute(`
+        await pool.execute(`
             CREATE TABLE IF NOT EXISTS releases (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 youtube_video_id VARCHAR(255) UNIQUE NOT NULL,
@@ -75,6 +83,11 @@ const initDB = async () => {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         `);
 
+        // Keepalive to prevent idle disconnects on some providers
+        setInterval(() => {
+            pool.query('SELECT 1').catch(() => {});
+        }, 60 * 1000);
+
         console.log('Database initialized successfully');
     } catch (error) {
         console.error('Database initialization error:', error);
@@ -87,8 +100,8 @@ const initDB = async () => {
 // Get all videos with pagination and search
 app.get('/api/videos', async (req, res) => {
     try {
-        // Check if database connection is available
-        if (!db) {
+    // Check if database connection is available
+    if (!pool) {
             console.error('Database connection not available');
             return res.status(500).json({ error: 'Database connection not available' });
         }
@@ -116,8 +129,8 @@ app.get('/api/videos', async (req, res) => {
         console.log('Executing query:', query);
         console.log('With params:', params);
 
-        const [videos] = await db.execute(query, params);
-        const [countResult] = await db.execute(countQuery, countParams);
+    const [videos] = await dbQuery(query, params);
+    const [countResult] = await dbQuery(countQuery, countParams);
         
         const total = countResult[0].total;
         const totalPages = Math.ceil(total / limit);
@@ -152,7 +165,7 @@ app.get('/api/videos', async (req, res) => {
 // Get single video by ID
 app.get('/api/videos/:id', async (req, res) => {
     try {
-        const [videos] = await db.execute('SELECT * FROM videos WHERE id = ?', [req.params.id]);
+    const [videos] = await dbQuery('SELECT * FROM videos WHERE id = ?', [req.params.id]);
         
         if (videos.length === 0) {
             return res.status(404).json({ error: 'Video not found' });
@@ -174,12 +187,12 @@ app.post('/api/videos', async (req, res) => {
             return res.status(400).json({ error: 'Title and file_url are required' });
         }
 
-        const [result] = await db.execute(
+    const [result] = await dbQuery(
             'INSERT INTO videos (title, file_url) VALUES (?, ?)',
             [title, file_url]
         );
 
-        const [newVideo] = await db.execute('SELECT * FROM videos WHERE id = ?', [result.insertId]);
+    const [newVideo] = await dbQuery('SELECT * FROM videos WHERE id = ?', [result.insertId]);
         
         res.status(201).json(newVideo[0]);
     } catch (error) {
@@ -198,7 +211,7 @@ app.put('/api/videos/:id', async (req, res) => {
             return res.status(400).json({ error: 'Title and file_url are required' });
         }
 
-        const [result] = await db.execute(
+    const [result] = await dbQuery(
             'UPDATE videos SET title = ?, file_url = ? WHERE id = ?',
             [title, file_url, videoId]
         );
@@ -207,7 +220,7 @@ app.put('/api/videos/:id', async (req, res) => {
             return res.status(404).json({ error: 'Video not found' });
         }
 
-        const [updatedVideo] = await db.execute('SELECT * FROM videos WHERE id = ?', [videoId]);
+    const [updatedVideo] = await dbQuery('SELECT * FROM videos WHERE id = ?', [videoId]);
         
         res.json(updatedVideo[0]);
     } catch (error) {
@@ -219,7 +232,7 @@ app.put('/api/videos/:id', async (req, res) => {
 // Delete video
 app.delete('/api/videos/:id', async (req, res) => {
     try {
-        const [result] = await db.execute('DELETE FROM videos WHERE id = ?', [req.params.id]);
+    const [result] = await dbQuery('DELETE FROM videos WHERE id = ?', [req.params.id]);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Video not found' });
@@ -272,8 +285,8 @@ app.get('/api/releases', async (req, res) => {
 
         query += ` ORDER BY published_at DESC LIMIT ${limit} OFFSET ${offset}`;
 
-        const [releases] = await db.execute(query, params);
-        const [countResult] = await db.execute(countQuery, countParams);
+    const [releases] = await dbQuery(query, params);
+    const [countResult] = await dbQuery(countQuery, countParams);
         
         const total = countResult[0].total;
         const totalPages = Math.ceil(total / limit);
@@ -311,7 +324,7 @@ app.post('/api/releases/:id/approve', async (req, res) => {
         const customTitle = (req.body && req.body.custom_title && req.body.custom_title.trim()) ? req.body.custom_title.trim() : null;
 
         // Get the release
-        const [releases] = await db.execute('SELECT * FROM releases WHERE id = ?', [releaseId]);
+    const [releases] = await dbQuery('SELECT * FROM releases WHERE id = ?', [releaseId]);
         if (releases.length === 0) {
             return res.status(404).json({ error: 'Release not found' });
         }
@@ -319,18 +332,18 @@ app.post('/api/releases/:id/approve', async (req, res) => {
 
         // If customTitle is provided, update the release title before approving
         if (customTitle) {
-            await db.execute('UPDATE releases SET title = ? WHERE id = ?', [customTitle, releaseId]);
+            await dbQuery('UPDATE releases SET title = ? WHERE id = ?', [customTitle, releaseId]);
             release.title = customTitle;
         }
 
         // Add to videos table with the (possibly updated) title
-        const [result] = await db.execute(
+    const [result] = await dbQuery(
             'INSERT INTO videos (title, file_url) VALUES (?, ?)',
             [release.title, release.youtube_url]
         );
 
         // Update release status
-        await db.execute(
+    await dbQuery(
             'UPDATE releases SET status = ? WHERE id = ?',
             ['approved', releaseId]
         );
@@ -350,7 +363,7 @@ app.post('/api/releases/:id/reject', async (req, res) => {
     try {
         const releaseId = req.params.id;
         
-        const [result] = await db.execute(
+    const [result] = await dbQuery(
             'UPDATE releases SET status = ? WHERE id = ?',
             ['rejected', releaseId]
         );
@@ -369,7 +382,7 @@ app.post('/api/releases/:id/reject', async (req, res) => {
 // Delete a release
 app.delete('/api/releases/:id', async (req, res) => {
     try {
-        const [result] = await db.execute('DELETE FROM releases WHERE id = ?', [req.params.id]);
+    const [result] = await dbQuery('DELETE FROM releases WHERE id = ?', [req.params.id]);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Release not found' });
@@ -404,7 +417,7 @@ app.get('/api/health', (req, res) => {
     res.json({ 
         status: 'OK', 
         timestamp: new Date().toISOString(),
-        database: db ? 'Connected' : 'Disconnected'
+    database: pool ? 'Connected' : 'Disconnected'
     });
 });
 
@@ -422,17 +435,13 @@ app.use((req, res) => {
 // Handle graceful shutdown
 process.on('SIGTERM', async () => {
     console.log('SIGTERM received, shutting down gracefully');
-    if (db) {
-        await db.end();
-    }
+    if (pool) await pool.end();
     process.exit(0);
 });
 
 process.on('SIGINT', async () => {
     console.log('SIGINT received, shutting down gracefully');
-    if (db) {
-        await db.end();
-    }
+    if (pool) await pool.end();
     process.exit(0);
 });
 

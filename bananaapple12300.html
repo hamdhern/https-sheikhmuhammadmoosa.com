@@ -425,21 +425,31 @@
             try {
                 const status = document.getElementById('statusFilter').value;
                 const response = await fetch(`${API_BASE_URL}/releases?page=${page}&limit=10&status=${status}`);
+                if (!response.ok) {
+                    let msg = `HTTP ${response.status}`;
+                    try { const err = await response.json(); msg = err?.error || msg; } catch {}
+                    throw new Error(msg);
+                }
                 const data = await response.json();
-                
-                displayReleases(data.releases);
-                displayReleasesPagination(data.pagination);
-                currentReleasePage = data.pagination.currentPage;
-                totalReleasePages = data.pagination.totalPages;
+
+                const releases = Array.isArray(data?.releases) ? data.releases : [];
+                const pagination = data?.pagination || { currentPage: 1, totalPages: 0, hasNextPage: false, hasPrevPage: false };
+
+                displayReleases(releases);
+                displayReleasesPagination(pagination);
+                currentReleasePage = pagination.currentPage ?? 1;
+                totalReleasePages = pagination.totalPages ?? 1;
             } catch (error) {
                 console.error('Error loading releases:', error);
                 document.getElementById('releasesListContainer').innerHTML = `
                     <div class="error-message">
                         <h3>Error</h3>
-                        <p>Failed to load releases. Please try again.</p>
+                        <p>Failed to load releases${error?.message ? `: ${error.message}` : ''}. Please try again.</p>
                         <button onclick="loadReleases()" class="retry-btn">Retry</button>
                     </div>
                 `;
+                // Clear pagination on error
+                document.getElementById('releasesPagination').innerHTML = '';
             }
         }
 
@@ -484,28 +494,29 @@
         // Display releases pagination
         function displayReleasesPagination(paginationData) {
             const container = document.getElementById('releasesPagination');
-            
-            if (paginationData.totalPages <= 1) {
+            const total = Number(paginationData?.totalPages ?? 0);
+            const current = Number(paginationData?.currentPage ?? 1);
+            const hasPrev = Boolean(paginationData?.hasPrevPage);
+            const hasNext = Boolean(paginationData?.hasNextPage);
+
+            if (!Number.isFinite(total) || total <= 1) {
                 container.innerHTML = '';
                 return;
             }
 
             let paginationHTML = '';
-            
-            // Previous button
-            if (paginationData.hasPrevPage) {
-                paginationHTML += `<button class="page-link" onclick="loadReleases(${paginationData.currentPage - 1})">Previous</button>`;
+
+            if (hasPrev) {
+                paginationHTML += `<button class="page-link" onclick="loadReleases(${current - 1})">Previous</button>`;
             }
 
-            // Page numbers
-            for (let i = 1; i <= paginationData.totalPages; i++) {
-                const isActive = i === paginationData.currentPage ? 'active' : '';
+            for (let i = 1; i <= total; i++) {
+                const isActive = i === current ? 'active' : '';
                 paginationHTML += `<button class="page-link ${isActive}" onclick="loadReleases(${i})">${i}</button>`;
             }
 
-            // Next button
-            if (paginationData.hasNextPage) {
-                paginationHTML += `<button class="page-link" onclick="loadReleases(${paginationData.currentPage + 1})">Next</button>`;
+            if (hasNext) {
+                paginationHTML += `<button class="page-link" onclick="loadReleases(${current + 1})">Next</button>`;
             }
 
             container.innerHTML = paginationHTML;
@@ -596,21 +607,31 @@
         async function loadVideos(page = 1) {
             try {
                 const response = await fetch(`${API_BASE_URL}/videos?page=${page}&limit=10`);
+                if (!response.ok) {
+                    let msg = `HTTP ${response.status}`;
+                    try { const err = await response.json(); msg = err?.error || msg; } catch {}
+                    throw new Error(msg);
+                }
                 const data = await response.json();
-                
-                displayVideos(data.videos);
-                displayPagination(data.pagination);
-                currentPage = data.pagination.currentPage;
-                totalPages = data.pagination.totalPages;
+
+                const videos = Array.isArray(data?.videos) ? data.videos : [];
+                const pagination = data?.pagination || { currentPage: 1, totalPages: 0, hasNextPage: false, hasPrevPage: false };
+
+                displayVideos(videos);
+                displayPagination(pagination);
+                currentPage = pagination.currentPage ?? 1;
+                totalPages = pagination.totalPages ?? 1;
             } catch (error) {
                 console.error('Error loading videos:', error);
                 document.getElementById('videoListContainer').innerHTML = `
                     <div class="error-message">
                         <h3>Error</h3>
-                        <p>Failed to load videos. Please try again.</p>
+                        <p>Failed to load videos${error?.message ? `: ${error.message}` : ''}. Please try again.</p>
                         <button onclick="loadVideos()" class="retry-btn">Retry</button>
                     </div>
                 `;
+                // Clear pagination on error
+                document.getElementById('adminPagination').innerHTML = '';
             }
         }
 
@@ -645,28 +666,29 @@
         // Display pagination
         function displayPagination(paginationData) {
             const container = document.getElementById('adminPagination');
-            
-            if (paginationData.totalPages <= 1) {
+            const total = Number(paginationData?.totalPages ?? 0);
+            const current = Number(paginationData?.currentPage ?? 1);
+            const hasPrev = Boolean(paginationData?.hasPrevPage);
+            const hasNext = Boolean(paginationData?.hasNextPage);
+
+            if (!Number.isFinite(total) || total <= 1) {
                 container.innerHTML = '';
                 return;
             }
 
             let paginationHTML = '';
-            
-            // Previous button
-            if (paginationData.hasPrevPage) {
-                paginationHTML += `<button class="page-link" onclick="loadVideos(${paginationData.currentPage - 1})">Previous</button>`;
+
+            if (hasPrev) {
+                paginationHTML += `<button class="page-link" onclick="loadVideos(${current - 1})">Previous</button>`;
             }
 
-            // Page numbers
-            for (let i = 1; i <= paginationData.totalPages; i++) {
-                const isActive = i === paginationData.currentPage ? 'active' : '';
+            for (let i = 1; i <= total; i++) {
+                const isActive = i === current ? 'active' : '';
                 paginationHTML += `<button class="page-link ${isActive}" onclick="loadVideos(${i})">${i}</button>`;
             }
 
-            // Next button
-            if (paginationData.hasNextPage) {
-                paginationHTML += `<button class="page-link" onclick="loadVideos(${paginationData.currentPage + 1})">Next</button>`;
+            if (hasNext) {
+                paginationHTML += `<button class="page-link" onclick="loadVideos(${current + 1})">Next</button>`;
             }
 
             container.innerHTML = paginationHTML;
